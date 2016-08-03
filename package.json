@@ -1,0 +1,11 @@
+{
+  "name": "boardgametracker",
+  "version": "0.0.1",
+  "description": "tracks boardgames user likes",
+  "main": "config.ru",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dexter R Golden <dexterrgolden@gmail.com>",
+  "license": "MIT"
+}
