@@ -2,32 +2,80 @@ require 'httparty'
 require 'json'
 
 class GamesController < ApplicationController
+#####turn string keys to hash
+def symbolize(obj)
+  return obj.reduce({}) do |memo, (k, v)|
+    memo.tap { |m| m[k.to_sym] = symbolize(v) }
+  end if obj.is_a? Hash    
+    return obj.reduce([]) do |memo, v| 
+      memo << symbolize(v); memo
+    end if obj.is_a? Array      
+    obj
+end
+############################      
+
+#SEARCH
+post '/search/?' do 
+  if params["name"] == ""
+    session[:message] = "Please enter a boardgame title to search"
+    # erb :search_results
+    redirect to('/../profile')
+  end  
+
+  puts params
+  puts "Still going"
+
+  searchname = params["name"]
+  boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
+  puts "==============START====Attempting to serach by title" 
+  response = HTTParty.get(boardgamegeekApiSearch)     
+
+ respP = response.parsed_response
+ respP = symbolize(respP)
+
+ search_results = [] ###prepare search results
+ 
+count = 0
+
+ if respP[:items][:item].class == Array
+  puts "Results are array"
+  
+    respP[:items][:item].each do |entry|         
+     @name = entry[:name][:value] 
+     @geekId = entry[:id] 
+     # puts "#{count} result is good geekId #{@geekId} with yP class of #{entry[:yearpublished].class} and yP of #{entry[:yearpublished]}"
+
+     @yearPublished = entry[:yearpublished] ? entry[:yearpublished][:value] : 0 ###some entries don't have yearPublished val whch crashes
+     search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished})   
+    end 
+  else
+    @name = respP[:items][:item][:name][:value] 
+    @geekId = respP[:items][:item][:id]  
+    @yearPublished = respP[:items][:item][:yearpublished] ? respP[:items][:item][:yearpublished][:value] : 0 
+    search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished}) 
+  end
+
+  @search_results = search_results
+  erb :search_results
+end   
+
 #GEEK API
 post '/geekapi/?' do 
-    # response = HTTParty.get("http://www.boardgamegeek.com/xmlapi2/thing?id=124742&stats=1&ratingcomments=1")
-    boardgamegeekApi2 = "http://www.boardgamegeek.com/xmlapi2/thing?id="
-    geekId = params["geekId"]
-    geekArgs = "&stats=1&ratingcomments=1"
-    response = HTTParty.get(boardgamegeekApi2 + geekId + geekArgs)
 
-    puts "==============START=================="    
-
-   respP = response.parsed_response
-
-
-#####turn string keys to hash
-     def symbolize(obj)
-      return obj.reduce({}) do |memo, (k, v)|
-        memo.tap { |m| m[k.to_sym] = symbolize(v) }
-      end if obj.is_a? Hash    
-        return obj.reduce([]) do |memo, v| 
-          memo << symbolize(v); memo
-        end if obj.is_a? Array      
-        obj
-      end
-  respP = symbolize(respP)
+  p '-----------------------------'
+  p params
+  p session[:user_id]
+  p '-----------------------------'
+  #response = HTTParty.get("http://www.boardgamegeek.com/xmlapi2/thing?id=124742&stats=1&ratingcomments=1")
+  boardgamegeekApi2 = "http://www.boardgamegeek.com/xmlapi2/thing?id="
+  geekId = params["geekId"]
+  geekArgs = "&stats=1&ratingcomments=1"
+  response = HTTParty.get(boardgamegeekApi2 + geekId + geekArgs)
+  puts "==============START=================="
+  respP = response.parsed_response ###httparty method
+  respP = symbolize(respP)###method symbolize defined at top for all of controller
   puts respP
-########=====================
+
 # binding.pry
 
   if respP[:items][:item][:name].class == Array
