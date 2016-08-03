@@ -4,41 +4,49 @@
   <title><%= @username %>'s recs</title>
 </head>
 <body>
-  
-  <div>
-    <p>Username: <%= @username %></p>
-    <p>Password: <%= @password %></p>
-    <p>Email: <%= @email %></p>
-    <p>UserId: <%= "#{session[:user_id]}" %></p>
+  <div class="container">
+    <div>
+      <p>Username: <%= @username %></p>
+      <p>Password: <%= @password %></p>
+      <p>Email: <%= @email %></p>
+      <p>UserId: <%= "#{session[:user_id]}" %></p>
+
+      
+    </div>
+
+    <div>
+      <h1>Add game you like</h1>
+      <form method="post" action="/games/geekapi/">
+        <input type="text" name="geekId" placeholder="Geek Id number" />
+        <button class="btn btn-sm btn-primary">SUBMIT</button>
+      </form>
+    </div>
+
+
+
+    <h1>Games <%= "#{@username}" %> likes</h1>
 
     
-  </div>
-
-  <div>
-    <h1>Add game you like</h1>
-    <form method="post" action="/games/geekapi/">
-      <input type="text" name="geekId" placeholder="Geek Id number" /><br />
-      <button class="btn btn-sm btn-primary">SUBMIT</button>
-    </form>
-  </div>
-
-
-
-  <h1>Games <%= "#{@username}" %> likes</h1>
-
-  
-  
-  <% if @games_liked %>
-    <% @games_liked.each do |game| %>
-    <div class="col-xs-6 col-md-4">
-      <h1><%= game.name %></h1>
-        <div><img src=http://<%= "#{game.img_src}" %>  img data-src="holder.js/200x200" class="img-thumbnail" alt="200x200" data-holder-rendered="true" style="width: 200px; height: 200px;"/></div>
-        <div><%= game.description %></div>
-    </div>    
+    <div class="row row-eq-height">
+    <% if @games_liked %>
+      <% @games_liked.each do |game| %>
       
+        <div class="col-xs-6 col-sm-4 col-md-3 ">
+         
+            <!-- <h3 class="col col-eq-height"><%= game.name %></h3>  -->         
+            <div>
+              <img src=http://<%= "#{game.img_src}" %>  img data-src="holder.js/200x200" class="img-thumbnail center-block" alt="<%= game.name %>" data-holder-rendered="true" style="width: 200px; height: 200px;"/>
+            </div>
+            <br />
+            <!-- <div class="well well-sm row-eq-height"><%= game.description.slice(0, 200 || game.description.length) %>              
+            </div> -->
+        </div>
+       
+        
+      <% end %>
     <% end %>
-  <% end %>
-
+    </div> 
+  </div>
 </body>
 </html>
 
