@@ -16,11 +16,8 @@
       </form>
     </div> -->
 
-    <% if @message %>
-      <h1><%= @message %></h1>
-    <% end %>
 
-    <h1><%= "#{@username}" %>'s Games</h1>
+    <h1><%= session[:username]%>'s Games</h1>
 
     
     <div class="row row-eq-height">

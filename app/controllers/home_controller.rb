@@ -12,14 +12,27 @@ class HomeController < ApplicationController
     erb :login    
   end
 
+  get '/register/?' do
+      if session[:is_logged_in]
+        redirect to('/../profile')        
+      else  
+        erb :register
+      end        
+  end
+
   get '/profile/?' do
     @games_liked = Game.where user_id: session[:user_id]
     user = User.find(session[:user_id])
       if user
         @username = user.username
       end  
-     erb :profile  
-     
+     erb :profile     
+  end
+
+  get '/signout/?' do    
+      session[:is_logged_in] = false
+      session[:user_id] = nil
+      redirect to('/')  
   end
 
 
@@ -30,6 +43,8 @@ class HomeController < ApplicationController
         if compare_to == params["password"]          
           session[:is_logged_in] = true
           session[:user_id] = user.id
+          session[:username] = user.username
+
           # puts "isLoggedIn: #{session[:is_logged_in]}"
           redirect to('/profile') 
         else
@@ -41,7 +56,11 @@ class HomeController < ApplicationController
   end
 
   get '/' do      
-    erb :register
+    if session[:is_logged_in]
+        redirect to('/../profile')        
+      else  
+        erb :login
+      end  
   end  
 
 end

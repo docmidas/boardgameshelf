@@ -21,17 +21,24 @@ post '/search/?' do
     # erb :search_results
     redirect to('/../profile')
   end  
-
-  puts params
   puts "Still going"
 
   searchname = params["name"]
   boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
   puts "==============START====Attempting to serach by title" 
-  response = HTTParty.get(boardgamegeekApiSearch)     
+  response = HTTParty.get(boardgamegeekApiSearch)  
+
 
  respP = response.parsed_response
+puts "No results"
+puts respP
+
  respP = symbolize(respP)
+
+ if respP[:items][:total] == "0"
+  session[:message] = "No results found"  
+  redirect to('/../profile') 
+ end 
 
  search_results = [] ###prepare search results
  

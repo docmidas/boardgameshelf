@@ -1,6 +1,6 @@
   <div class="container">
     <div>
-      <p>Username: <%= @username %></p>
+      <p>Username: <%= session[:username] %></p>
       <p>Password: <%= @password %></p>
       <p>Email: <%= @email %></p>
       <p>UserId: <%= "#{session[:user_id]}" %></p>      
