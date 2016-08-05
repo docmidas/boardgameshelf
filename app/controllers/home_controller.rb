@@ -21,18 +21,23 @@ class HomeController < ApplicationController
   end
 
   get '/profile/?' do
-    @games_liked = Game.where user_id: session[:user_id]
-    user = User.find(session[:user_id])
+    if !session[:is_logged_in]
+      redirect to('/')
+    else
+      @games_liked = Game.where user_id: session[:user_id]
+      user = User.find(session[:user_id])
       if user
         @username = user.username
       end  
-     erb :profile     
+     erb :profile
+    end  
+       
   end
 
   get '/signout/?' do    
       session[:is_logged_in] = false
       session[:user_id] = nil
-      redirect to('/')  
+      redirect to('/')
   end
 
 
@@ -48,10 +53,14 @@ class HomeController < ApplicationController
           # puts "isLoggedIn: #{session[:is_logged_in]}"
           redirect to('/profile') 
         else
-          {status: "ERROR", message: "right user, WRONG password"}.to_json         
+          # {status: "ERROR", message: "right user, WRONG password"}.to_json
+          session[:message] = "username exists, but WRONG password"
+          redirect to("/")         
         end        
       else
-        {status: "ERROR", message: "Could NOT find user"}.to_json
+        # {status: "ERROR", message: "Could NOT find user"}.to_json
+        session[:message] = "Could NOT find user"
+        redirect to("/")
       end    
   end
 

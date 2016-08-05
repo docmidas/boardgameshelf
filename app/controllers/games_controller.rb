@@ -12,28 +12,24 @@ def symbolize(obj)
     end if obj.is_a? Array      
     obj
 end
-############################      
-
-#SEARCH
-post '/search/?' do 
+############################
+#GAME NAME SEARCH
+post '/search/?' do
+  ##### CHECK FOR FORM FILL
   if params["name"] == ""
     session[:message] = "Please enter a boardgame title to search"
     # erb :search_results
     redirect to('/../profile')
   end  
-  puts "Still going"
+  
 
   searchname = params["name"]
   boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
   puts "==============START====Attempting to serach by title" 
-  response = HTTParty.get(boardgamegeekApiSearch)  
+  response = HTTParty.get(boardgamegeekApiSearch)
+  respP = response.parsed_response #####parse xml to hash
 
-
- respP = response.parsed_response
-puts "No results"
-puts respP
-
- respP = symbolize(respP)
+  respP = symbolize(respP) #####symbolize string keys
 
  if respP[:items][:total] == "0"
   session[:message] = "No results found"  
@@ -42,7 +38,6 @@ puts respP
 
  search_results = [] ###prepare search results
  
-count = 0
 
  if respP[:items][:item].class == Array
   puts "Results are array"
@@ -64,9 +59,10 @@ count = 0
 
   @search_results = search_results
   erb :search_results
-end   
-
-#GEEK API
+end 
+#########==end game search 
+##################################
+####Add game to my game inventory
 post '/geekapi/?' do 
 
   p '-----------------------------'
@@ -80,13 +76,19 @@ post '/geekapi/?' do
   response = HTTParty.get(boardgamegeekApi2 + geekId + geekArgs)
   puts "==============START=================="
   respP = response.parsed_response ###httparty method
+
   respP = symbolize(respP)###method symbolize defined at top for all of controller
-  puts respP
 
-# binding.pry
+  # binding.pry
+  puts "This is the response CLASS #{respP.class}"
 
-  if respP[:items][:item][:name].class == Array
-    respP[:items][:item][:name].each do |entry|
+
+
+def addSingleGame(respP_entry)
+####  
+ 
+  if respP_entry[:name].class == Array  # grab primary title
+    respP_entry[:name].each do |entry|
          if entry[:type]== "primary"  
          # if entry["item"]== "primary"          
            puts "Game name is: #{entry[:value]}"
@@ -94,23 +96,20 @@ post '/geekapi/?' do
          end  
     end   
   else
-    @name = respP[:items][:item][:name][:value]
+    @name = respP_entry[:name][:value]
   end
-    # puts "Image URL: #{respP[:items][:item][:image].sub("//", "")}"
-    @image = respP[:items][:item][:image].sub("//", "")
-    # puts @name
+##############  
+  # puts "Image URL: #{respP_entry[:image].sub("//", "")}"
+  @image = respP_entry[:image]? respP_entry[:image].sub("//", "") : "No image"
 
+  boardgamelinks = []       #####prep characteristic arrays
+  boardgamecategory = []
+  boardgamemechanic = []
+  boardgamefamily = []
+  boardgamedesigner = []
 
-
-    boardgamelinks = []
-    boardgamecategory = []
-    boardgamemechanic = []
-    boardgamefamily = []
-    boardgamedesigner = []
-
-
-
-    respP[:items][:item][:link].each do |entry|
+  if respP_entry[:link]
+    respP_entry[:link].each do |entry|
       if entry[:type] == "boardgamecategory"
         boardgamecategory.push(entry[:value])    
       elsif entry[:type] == "boardgamemechanic"
@@ -121,26 +120,22 @@ post '/geekapi/?' do
         boardgamedesigner.push(entry[:value])
       end
     end
-
-    puts "Categories: #{boardgamecategory}"
-    puts "Mechanics: #{boardgamemechanic}"
-    puts "Family: #{boardgamefamily}"
-    puts "Designer: #{boardgamedesigner}"
+  end 
 
     @boardgamecategory = boardgamecategory[0] || nil
     @boardgamemechanic = boardgamemechanic[0] || nil
     # @designer = boardgamedesigner.join(", ") || nil
     @designer = boardgamedesigner[0]|| nil
-    @weight = respP[:items][:item][:statistics][:ratings][:averageweight][:value]
+    @weight = respP_entry[:statistics][:ratings][:averageweight][:value]
     # puts "averageweight: #{averageweight}"
 
-    @playtime = respP[:items][:item][:playingtime][:value]
+    @playtime = respP_entry[:playingtime][:value]
     # puts "Playtime: #{playingtime}"
 
-    @description = respP[:items][:item][:description]
+    @description = respP_entry[:description]
     # puts description
 
-    @geekId = respP[:items][:item][:id]
+    @geekId = respP_entry[:id]
     # puts "geekId: #{geekId}"
     # ######## works with vers1
 
@@ -148,33 +143,35 @@ post '/geekapi/?' do
     yearAdjusted = dateAdded.year * 1000
     @scrape_date = yearAdjusted + DateTime.now.yday
     # puts date_adjusted
-    @user_id = session[:user_id]
-
-
-     # return respP.to_json  
+    @user_id = session[:user_id] ###dont need user_id for entering game entries. her for posterity
+ 
 
       def add_game
-          HTTParty.post("http://localhost:9292/games/", body: {name: @name, geekId: @geekId, image: @image, scrape_date: @scrape_date, weight: @weight, playtime: @playtime, description: @description, user_id: @user_id, designer: @designer})
+          HTTParty.post("http://localhost:9292/games/", body: {name: @name, geekId: @geekId, image: @image, scrape_date: @scrape_date, weight: @weight, playtime: @playtime, description: @description, designer: @designer})
             # puts "#{@name}, #{@boardgamemechanic}, #{@boardgamecategory}"
       end 
-
-      def get_games
-        # HTTParty.get("http://localhost:9292/games/")
-            # puts "#{@name}, #{@boardgamemechanic}, #{@boardgamecategory}"
-      end 
-      
-    puts "Trying to add game"
     add_game()
+  end ###### END OF addSingleGame()
 
+if respP[:items][:item].class == Hash
+  addSingleGame(respP[:items][:item])
+elsif respP[:items][:item].class == Array
+  # puts respP[:items][:item].class
+  respP[:items][:item].each do |var|
+    addSingleGame(var)  
+  end
+end
+
+# puts "DEX this is a single search: #{respP[:items][:item].class}"
+# addSingleGame(respP)
 
     # puts "Trying to GET games"
     # get_games()
     puts "====================FINISH=================="
-@games_liked = Game.where user_id: session[:user_id]
-# erb :suggestions
-redirect to('/../profile')
+  redirect to('/../games')
 end
-
+########################
+##################################
 
 
 ###Retriev single game id
@@ -211,38 +208,34 @@ end
   get '/?' do
     games = Game.all    
      if games
-        games.to_json    
+        @games_all = games
+        erb :inventory    
       else
         {status: "ERROR", message: "Could not FIND ALL games"}.to_json    
       end
   end
-# CREATE NEW ENTRY
+# CREATE GAME NEW ENTRY in my DB
   post '/?' do
-    game = Game.create name: params["name"], geek_id: params["geekId"], img_src: params["image"], scrape_date: params["scrape_date"], weight: params["weight"], playtime: params["playtime"], description: params["description"], user_id: params["user_id"], designer: params["designer"]
-    if game
-      {status: "ok", message: "#{game.name} was created"}.to_json      
-    else
-      {status: "error", message: "COULD NOT CREATE ENTRY"}.to_json
-    end    
+  
+  #########new create new entry code below. avoids redundancy by checking or existing geekik in mydb 1st
+  Game.where(geek_id: params["geekId"]).first_or_create do |game|
+    game.name = params["name"]
+    puts params["name"]
+    game.geek_id = params["geekId"]
+    game.img_src = params["image"]
+    game.scrape_date = params["scrape_date"]
+    game.weight = params["weight"]
+    game.playtime = params["playtime"]
+    game.description = params["description"]
+    game.designer = params["designer"]
   end
-###ALTERNATE MULTI-POST
-# post '/?' do
-#   games = [
-#           {name: "deception",theme: "murder mystery",category: "social deduction"},
-#           {name: "pandemic",theme: "bio disaster",category: "cooperative"},
-#           {name: "27th passenger",theme: "hitmen",category: "logic deduction"},
-#           {name: "alchemists",theme: "alchemy",category: "logic deduction"},
-#           {name: "flick em up",theme: "wild west",category: "dexterity"}
-#         ] 
-#   games.each do |entry|
-#     game = Game.create name: entry[:name], theme: entry[:theme], category: entry[:category]
-#   end
-# end
-
-
-
-
-
-
-
+end
+  ######old create new game entry code below. removed 
+  #   game = Game.create name: params["name"], geek_id: params["geekId"], img_src: params["image"], scrape_date: params["scrape_date"], weight: params["weight"], playtime: params["playtime"], description: params["description"], designer: params["designer"]
+  #   if game
+  #     {status: "ok", message: "#{game.name} was created"}.to_json      
+  #   else
+  #     {status: "error", message: "COULD NOT CREATE ENTRY"}.to_json
+  #   end    
+  # end
 end 

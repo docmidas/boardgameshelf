@@ -7,8 +7,39 @@ body {
     background-size: cover;
 }
 
-h1 {
-  color: white;
+h1, h2, h3, h4, h5, li {
+  color: #DDD;
+  font-family: 'Allerta', sans-serif;
+  text-shadow: 2px 2px #444;
+}
+
+p {
+  color: #efc88b;
+  font-family: 'Allerta', sans-serif;
+  text-shadow: 2px 2px #444;
+}
+
+.navbar {
+  opacity: 0.86;
+}
+
+a {
+  color: #DCE5D9;
+  
+}
+
+.glow {
+  text-shadow: 4px 4px  #222;
+}
+
+.showme{ 
+display: none;
+}
+.showhim:hover .showme{
+display : block;
+}
+.showhim:hover .ok{
+display : none;
 }
 
 

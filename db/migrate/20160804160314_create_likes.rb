@@ -1,6 +1,6 @@
-class CreateGames < ActiveRecord::Migration
+class CreateLikes < ActiveRecord::Migration
   def change
-    create_table     :games do |table|
+    create_table     :likes do |table|
       table.string   :name
       table.integer  :geek_id
       table.string   :img_src
@@ -8,7 +8,7 @@ class CreateGames < ActiveRecord::Migration
       table.float    :weight
       table.integer  :playtime
       table.text     :description
-      table.string   :designer
+      table.integer  :user_id
     end  
   end
 end

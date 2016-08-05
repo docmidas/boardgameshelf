@@ -1,16 +1,14 @@
 class UsersController < ApplicationController
 
-  get '/:id/?' do |id|
-      # get single user
-      user = User.find(id)
-      if user 
-        user.to_json
-      else
-        {status: "ERROR", message: "Could not FIND user"}.to_json
-      end 
-
-
-  end
+  # get '/:id/?' do |id|
+  #     # get single user
+  #     user = User.find(id)
+  #     if user 
+  #       user.to_json
+  #     else
+  #       {status: "ERROR", message: "Could not FIND user"}.to_json
+  #     end 
+  # end
 
   patch '/:id/?' do |id|
     #updates single cell of user
@@ -50,10 +48,14 @@ class UsersController < ApplicationController
     password = BCrypt::Password.create(params["password"])
     user = User.create username: params["username"], email: params["email"], password: password
 
-    if user 
-      user.to_json
+    if user          
+      session[:is_logged_in] = true
+      session[:user_id] = user.id
+      session[:username] = user.username
+      redirect to('/../profile') 
     else
-      {status: "ERROR", message: "Could not create user"}.to_json
+      session[:message] = "Could not create user"
+      redirect to("/")
     end
   end
 

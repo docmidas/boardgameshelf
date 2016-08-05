@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160801171607) do
+ActiveRecord::Schema.define(version: 20160804160314) do
 
   create_table "games", force: true do |t|
     t.string  "name"
@@ -21,8 +21,18 @@ ActiveRecord::Schema.define(version: 20160801171607) do
     t.float   "weight"
     t.integer "playtime"
     t.text    "description"
-    t.integer "user_id"
     t.string  "designer"
+  end
+
+  create_table "likes", force: true do |t|
+    t.string  "name"
+    t.integer "geek_id"
+    t.string  "img_src"
+    t.integer "scrape_date"
+    t.float   "weight"
+    t.integer "playtime"
+    t.text    "description"
+    t.integer "user_id"
   end
 
   create_table "users", force: true do |t|

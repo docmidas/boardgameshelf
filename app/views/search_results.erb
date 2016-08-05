@@ -1,22 +1,4 @@
   <div class="container">
-    <div>
-      <p>Username: <%= @username %></p>
-      <p>Password: <%= @password %></p>
-      <p>Email: <%= @email %></p>
-      <p>UserId: <%= session[:user_id] %></p>
-
-      
-    </div>
-
-    <!-- <div>
-      <h1>Add game you like</h1>
-      <form method="post" action="/games/geekapi/">
-        <input type="text" name="geekId" placeholder="Geek Id number" />
-        <button class="btn btn-sm btn-primary">SUBMIT</button>
-      </form>
-    </div> -->
-
-
     <h1><%= session[:username]%>'s Games</h1>
 
     
@@ -26,7 +8,7 @@
       <% if @search_results %>
         <% @search_results.each do |result| %>
           <li><%= result[:name] %>
-          <form method="post" action="/games/geekapi/">
+          <form method="post" action="/profile/geekapi">
             <input type="hidden" name="geekId" value="<%= result[:geekId] %>" />
             <button class="btn btn-sm btn-primary">Add To Shelf</button>
           </form>  
