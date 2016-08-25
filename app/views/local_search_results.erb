@@ -1,0 +1,41 @@
+  <div class="container">
+    <h1>LOCAL Search Results</h1>
+
+    
+    <div class="row row-eq-height">
+    <ul>
+
+      <% if @search_results %>
+      <% @search_results.each do |result| %>      
+        <div class="col-xs-6 col-sm-4 col-md-3 ">
+         
+            <!-- <h3 class="col col-eq-height"><%= result.name %></h3>  -->         
+            <div>
+              <img src="http://<%= result.img_src %>"  img data-src="holder.js/200x200" class="img-thumbnail center-block" alt="<%= result.name %>" data-holder-rendered="true" style="width: 200px; height: 200px;"/>
+              <form method="post" action="/profile/geekapi">
+                <input type="hidden" name="geekId" value="<%= result[:geek_id] %>" />
+                <button class="btn btn-sm btn-primary">Add To Shelf</button>
+              </form>  
+            </div>
+            <br />            
+        </div>  
+
+      <% end %>
+    <% end %>
+
+      </ul>
+    </div> 
+
+    <div class="row row-eq-height">
+      <!-- <a href=""><h3>More Results >></h3></a> -->
+      <form method="post" action="/games/search">
+        <input type="hidden" name="name" value="<%= @searchname %>" />
+        <button class="btn btn-sm btn-primary">Add To Shelf</button>
+      </form>
+
+    </div>
+
+
+
+
+  </div>

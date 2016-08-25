@@ -8,11 +8,13 @@ gem 'bcrypt', '~> 3.1', '>= 3.1.11'
 gem 'httparty'
 gem 'pry'
 gem 'tux'
-gem 'nokogiri', '~> 1.6', '>= 1.6.8'
-gem 'crack', '~> 0.4.3'
 gem 'xml2json'
 
 group :development do
   gem 'rerun', '~> 0.11.0'
   gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+end
+
+group :production do
+  gem 'pg'
 end

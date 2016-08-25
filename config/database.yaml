@@ -2,4 +2,8 @@ development:
   adapter: sqlite3
   database: ../db.sqlite3
 
-  
+production:
+  adapter: postgresql
+  database: prod_db
+  pool: 5
+  timeout: 5000

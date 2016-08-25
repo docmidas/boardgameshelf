@@ -12,11 +12,9 @@ class ProfileController < ApplicationController
       end if obj.is_a? Array      
       obj
   end
-############################      
- 
-
-#### asks GEEK API for a single game ID and then 
-#####post to root/local
+############################ 
+#### asks GEEK API for a single or multi IDs, separated by a comma and then ...
+#####posts to my /local
 ### add a game like
 post '/geekapi/?' do
 
@@ -49,7 +47,7 @@ post '/geekapi/?' do
   end
 ##############  
   # puts "Image URL: #{respP[:items][:item][:image].sub("//", "")}"
-  @image = respP[:items][:item][:image].sub("//", "")
+  @image = respP[:items][:item][:image] ? respP[:items][:item][:image].sub("//", "") : "upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
 
 ####################CHARACTERistics not needed for LIKES for this version atm
   # boardgamelinks = []       #####prep characteristic arrays
@@ -88,7 +86,7 @@ post '/geekapi/?' do
     # puts "averageweight: #{averageweight}"
     @playtime = respP[:items][:item][:playingtime][:value]
     # puts "Playtime: #{playingtime}"
-    @description = respP[:items][:item][:description]
+    @description = respP[:items][:item][:description] ? respP[:items][:item][:description] : "No description"
     # puts description
     @geekId = respP[:items][:item][:id]
 
@@ -133,10 +131,9 @@ end
         {status: "ERROR", message: "Could not DELETE game"}.to_json
       end  
   end
-
 #####################  
 #####UPDATE 
-####Dex, probably don't need an update for profile at this point
+####Dex, really don't need an update for profile at this point
   # patch '/:id/?' do |id|
   #   game = Game.find(id)   
   #   if game 
@@ -163,12 +160,15 @@ end
 ################
 ###CREATE NEW LIKE ENTRY
   post '/?' do
-    game = Like.create name: params["name"], geek_id: params["geekId"], img_src: params["image"], scrape_date: params["scrape_date"], weight: params["weight"], playtime: params["playtime"], description: params["description"], user_id: params["user_id"]
-    if game
-      # {status: "ok", message: "#{game.name} was created"}.to_json 
-      erb :profile     
-    else
-      {status: "error", message: "COULD NOT CREATE ENTRY"}.to_json
-    end    
+    Like.where(geek_id: params["geekId"], user_id: params["user_id"]).first_or_create do |like|
+      like.name = params["name"]
+      like.geek_id = params["geekId"]
+      like.img_src = params["image"]
+      like.scrape_date = params["scrape_date"]
+      like.weight = params["weight"]
+      like.playtime = params["playtime"]
+      like.description = params["description"]
+      like.user_id = params["user_id"]    
+    end   
   end
 end 

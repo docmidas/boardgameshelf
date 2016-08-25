@@ -1,14 +1,14 @@
 class UsersController < ApplicationController
 
-  # get '/:id/?' do |id|
-  #     # get single user
-  #     user = User.find(id)
-  #     if user 
-  #       user.to_json
-  #     else
-  #       {status: "ERROR", message: "Could not FIND user"}.to_json
-  #     end 
-  # end
+  get '/:id/?' do |id|
+      # get single user
+      user = User.find(id)
+      if user 
+        user.to_json
+      else
+        {status: "ERROR", message: "Could not FIND user"}.to_json
+      end 
+  end
 
   patch '/:id/?' do |id|
     #updates single cell of user
@@ -57,10 +57,5 @@ class UsersController < ApplicationController
       session[:message] = "Could not create user"
       redirect to("/")
     end
-  end
-
-
-  
-
-  
+  end  
 end

@@ -1,5 +1,5 @@
   <div class="container">
-    <h1><%= session[:username]%>'s Games</h1>
+    <h1>Search Results</h1>
 
     
     <div class="row row-eq-height">
@@ -7,20 +7,12 @@
 
       <% if @search_results %>
         <% @search_results.each do |result| %>
-          <li><%= result[:name] %>
-          <form method="post" action="/profile/geekapi">
-            <input type="hidden" name="geekId" value="<%= result[:geekId] %>" />
-            <button class="btn btn-sm btn-primary">Add To Shelf</button>
-          </form>  
-
-              <!-- <a href=""><button class="btn btn-sm btn-primary">Add To Shelf</button></a> -->
-              <div>
-                
-              </div>
-            </li>  
-              
-         
-          
+          <li><%= result[:name] %> (<%= result[:yearPublished]%>)
+            <form method="post" action="/profile/geekapi">
+              <input type="hidden" name="geekId" value="<%= result[:geekId] %>" />
+              <button class="btn btn-sm btn-primary">Add To Shelf</button>
+            </form>            
+          </li>
         <% end %>
       <% end %>
       </ul>

@@ -2,7 +2,7 @@ require 'httparty'
 require 'json'
 
 class GamesController < ApplicationController
-#####turn string keys to hash
+#####turn string keys to symbols
 def symbolize(obj)
   return obj.reduce({}) do |memo, (k, v)|
     memo.tap { |m| m[k.to_sym] = symbolize(v) }
@@ -15,52 +15,67 @@ end
 ############################
 #GAME NAME SEARCH
 post '/search/?' do
-  ##### CHECK FOR FORM FILL
+  ###Check for sign in
+  if session[:is_logged_in] != true
+    session[:message] = "You must be signed in to use this feature"
+    erb :login
+ else
+  ##### CHECK FOR FORM FILL, not blank  
   if params["name"] == ""
     session[:message] = "Please enter a boardgame title to search"
     # erb :search_results
     redirect to('/../profile')
-  end  
-  
-
+  end
   searchname = params["name"]
-  boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
-  puts "==============START====Attempting to serach by title" 
-  response = HTTParty.get(boardgamegeekApiSearch)
-  respP = response.parsed_response #####parse xml to hash
+############Check inventory first
+#
+  prelim_results = Game.where("name like ?", "%" + searchname + "%")
+  @searchname = searchname
+  @search_results = prelim_results
+  erb :local_search_results
 
-  respP = symbolize(respP) #####symbolize string keys
 
- if respP[:items][:total] == "0"
-  session[:message] = "No results found"  
-  redirect to('/../profile') 
- end 
 
- search_results = [] ###prepare search results
+
+# # 
+# ########Now start Geek query
+  
+#   boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
+#   puts "==============START====Attempting to serach by title" 
+#   response = HTTParty.get(boardgamegeekApiSearch)
+#   respP = response.parsed_response #####parse xml to hash
+
+#   respP = symbolize(respP) #####symbolize string keys
+
+#  if respP[:items][:total] == "0"
+#   session[:message] = "No results found"  
+#   redirect to('/../profile') 
+#  end 
+
+#  search_results = [] ###prepare search results
  
 
- if respP[:items][:item].class == Array
-  puts "Results are array"
+#  if respP[:items][:item].class == Array
+#   puts "Results are array"
   
-    respP[:items][:item].each do |entry|         
-     @name = entry[:name][:value] 
-     @geekId = entry[:id] 
-     # puts "#{count} result is good geekId #{@geekId} with yP class of #{entry[:yearpublished].class} and yP of #{entry[:yearpublished]}"
+#     respP[:items][:item].each do |entry|         
+#      @name = entry[:name][:value] 
+#      @geekId = entry[:id]
+#      @yearPublished = entry[:yearpublished] ? entry[:yearpublished][:value] : 0 ###some entries don't have yearPublished val whch crashes
+#      search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished})   
+#     end 
+#   else
+#     @name = respP[:items][:item][:name][:value] 
+#     @geekId = respP[:items][:item][:id]  
+#     @yearPublished = respP[:items][:item][:yearpublished] ? respP[:items][:item][:yearpublished][:value] : 0 
+#     search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished}) 
+#   end
 
-     @yearPublished = entry[:yearpublished] ? entry[:yearpublished][:value] : 0 ###some entries don't have yearPublished val whch crashes
-     search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished})   
-    end 
-  else
-    @name = respP[:items][:item][:name][:value] 
-    @geekId = respP[:items][:item][:id]  
-    @yearPublished = respP[:items][:item][:yearpublished] ? respP[:items][:item][:yearpublished][:value] : 0 
-    search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished}) 
-  end
-
-  @search_results = search_results
-  erb :search_results
-end 
-#########==end game search 
+#   @search_results = search_results
+#   erb :search_results
+end
+end
+#########==end game geek search 
 ##################################
 ####Add game to my game inventory
 post '/geekapi/?' do 
@@ -78,15 +93,10 @@ post '/geekapi/?' do
   respP = response.parsed_response ###httparty method
 
   respP = symbolize(respP)###method symbolize defined at top for all of controller
-
-  # binding.pry
-  puts "This is the response CLASS #{respP.class}"
-
-
-
+############
+#####method defined within  post
 def addSingleGame(respP_entry)
 ####  
- 
   if respP_entry[:name].class == Array  # grab primary title
     respP_entry[:name].each do |entry|
          if entry[:type]== "primary"  
@@ -98,8 +108,7 @@ def addSingleGame(respP_entry)
   else
     @name = respP_entry[:name][:value]
   end
-##############  
-  # puts "Image URL: #{respP_entry[:image].sub("//", "")}"
+##
   @image = respP_entry[:image]? respP_entry[:image].sub("//", "") : "No image"
 
   boardgamelinks = []       #####prep characteristic arrays
@@ -151,39 +160,23 @@ def addSingleGame(respP_entry)
             # puts "#{@name}, #{@boardgamemechanic}, #{@boardgamecategory}"
       end 
     add_game()
-  end ###### END OF addSingleGame()
+  end 
+################======END of addSingleGame()
 
-if respP[:items][:item].class == Hash
+if respP[:items][:item].class == Hash ####handles single game responses
   addSingleGame(respP[:items][:item])
-elsif respP[:items][:item].class == Array
+elsif respP[:items][:item].class == Array  ####handles multi-game responses
   # puts respP[:items][:item].class
   respP[:items][:item].each do |var|
     addSingleGame(var)  
   end
 end
 
-# puts "DEX this is a single search: #{respP[:items][:item].class}"
-# addSingleGame(respP)
-
-    # puts "Trying to GET games"
-    # get_games()
-    puts "====================FINISH=================="
+puts "====================FINISH=================="
   redirect to('/../games')
 end
-########################
+#############
 ##################################
-
-
-###Retriev single game id
-  # get '/:id/?' do |id|
-  #   game = Game.find(id)   
-  #   if game 
-  #      # {status: "Okay", message: "found a game #{params}"}.to_json
-  #      game.to_json
-  #     else
-  #      {status: "ERROR", message: "Could not UPDATE game"}.to_json
-  #     end    
-  # end
 #UPDATE game entry
   patch '/:id/?' do |id|
     game = Game.find(id)   
@@ -230,12 +223,5 @@ end
     game.designer = params["designer"]
   end
 end
-  ######old create new game entry code below. removed 
-  #   game = Game.create name: params["name"], geek_id: params["geekId"], img_src: params["image"], scrape_date: params["scrape_date"], weight: params["weight"], playtime: params["playtime"], description: params["description"], designer: params["designer"]
-  #   if game
-  #     {status: "ok", message: "#{game.name} was created"}.to_json      
-  #   else
-  #     {status: "error", message: "COULD NOT CREATE ENTRY"}.to_json
-  #   end    
-  # end
+
 end 
