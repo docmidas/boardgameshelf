@@ -8,5 +8,5 @@ require "sinatra/activerecord/rake"
 
 ActiveRecord::Base.establish_connection(
     :adapter => 'postgresql',
-    :database => 'prod_db'
+    :database => 'DATABASE_URL'
   )

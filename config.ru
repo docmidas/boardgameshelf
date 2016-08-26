@@ -9,7 +9,7 @@ Bundler.require :default, ENV['RACK_ENV'].to_sym
 
 ActiveRecord::Base.establish_connection(
     :adapter => 'postgresql',
-    :database => 'prod_db'
+    :database => 'DATABASE_URL'
   )
 
 #req models

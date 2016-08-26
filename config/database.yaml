@@ -4,6 +4,6 @@ development:
 
 production:
   adapter: postgresql
-  database: prod_db
+  database: DATABASE_URL
   pool: 5
   timeout: 5000
