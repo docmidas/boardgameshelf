@@ -10,11 +10,16 @@ gem 'pry'
 gem 'tux'
 gem 'xml2json'
 
-group :development do
-  gem 'rerun', '~> 0.11.0'
-  gem 'sqlite3', '~> 1.3', '>= 1.3.11'
-end
+# group :development do
+#   gem 'rerun', '~> 0.11.0'
+#   gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+# end
 
-group :production do
+# group :development do
+#   gem 'rerun', '~> 0.11.0'
+#   gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+# end
+
+group :development do
   gem 'pg'
 end
