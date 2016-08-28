@@ -13,7 +13,7 @@ require "sinatra/activerecord/rake"
 
 ActiveRecord::Base.establish_connection(
     :adapter => 'postgresql',
-    :database => 'd70711oclki99p',
+    :database => 'heroku pg:psql --app boardgameshelf DATABASE',
     :username => 'ctgjjgdwzouwwo',
     :password => 'HD1o5NCQPVMFo1kCcmL3ax9yu6'
   )
