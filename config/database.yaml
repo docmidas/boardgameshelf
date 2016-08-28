@@ -7,9 +7,9 @@
 #   adapter: postgresql
 #   database: ../db.sqlite3  
 
-development:
+production:
   adapter: postgresql
-  database: boardgameshelf
+  database: d70711oclki99p
   pool: 5
   timeout: 5000
   username: ctgjjgdwzouwwo
