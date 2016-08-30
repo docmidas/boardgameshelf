@@ -9,7 +9,7 @@
 
 production:
   adapter: postgresql
-  database: d70711oclki99p
+  database: boardgameshelf
   pool: 5
   timeout: 5000
   username: ctgjjgdwzouwwo
