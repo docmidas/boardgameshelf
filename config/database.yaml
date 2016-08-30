@@ -1,18 +1,18 @@
 #original
-# development:
-#   adapter: sqlite3
-#   database: ../db.sqlite3
+development:
+  adapter: sqlite3
+  database: ../db.sqlite3
 
 # development:
 #   adapter: postgresql
 #   database: ../db.sqlite3  
 
-production:
-  adapter: postgresql
-  database: boardgameshelf
-  pool: 5
-  timeout: 5000
-  username: ctgjjgdwzouwwo
-  password: HD1o5NCQPVMFo1kCcmL3ax9yu6
+# production:
+#   adapter: postgresql
+#   database: boardgameshelf
+#   pool: 5
+#   timeout: 5000
+#   username: ctgjjgdwzouwwo
+#   password: HD1o5NCQPVMFo1kCcmL3ax9yu6
 
   # postgres://ctgjjgdwzouwwo:HD1o5NCQPVMFo1kCcmL3ax9yu6@ec2-23-23-76-90.compute-1.amazonaws.com:5432/d70711oclki99p

@@ -2,17 +2,18 @@ require 'bundler'
 
 Bundler.require :default, ENV['RACK_ENV'].to_sym
 
-# ActiveRecord::Base.establish_connection(
-#     :adapter => 'sqlite3',
-#     :database => 'db.sqlite3'
-#   )
-
+###Works in dev
 ActiveRecord::Base.establish_connection(
-    :adapter => 'postgresql',
-    :database => 'boardgameshelf',
-    :username => 'ctgjjgdwzouwwo',
-    :password => 'HD1o5NCQPVMFo1kCcmL3ax9yu6'
+    :adapter => 'sqlite3',
+    :database => 'db.sqlite3'
   )
+
+# ActiveRecord::Base.establish_connection(
+#     :adapter => 'postgresql',
+#     :database => 'boardgameshelf',
+#     :username => 'ctgjjgdwzouwwo',
+#     :password => 'HD1o5NCQPVMFo1kCcmL3ax9yu6'
+#   )
 
 #req models
 require './app/models/user'
