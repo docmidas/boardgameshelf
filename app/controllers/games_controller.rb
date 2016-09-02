@@ -29,10 +29,10 @@ post '/search/?' do
   searchname = params["name"]
 ############Check inventory first
 #
-  prelim_results = Game.where("name like ?", "%" + searchname + "%")
-  @searchname = searchname
-  @search_results = prelim_results
-  erb :local_search_results
+  # prelim_results = Game.where("name like ?", "%" + searchname + "%")
+  # @searchname = searchname
+  # @search_results = prelim_results
+  # erb :local_search_results
 
 
 
@@ -40,39 +40,39 @@ post '/search/?' do
 # # 
 # ########Now start Geek query
   
-#   boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
-#   puts "==============START====Attempting to serach by title" 
-#   response = HTTParty.get(boardgamegeekApiSearch)
-#   respP = response.parsed_response #####parse xml to hash
+  boardgamegeekApiSearch = "http://www.boardgamegeek.com/xmlapi2/search?query=#{searchname}&type=boardgame"
+  puts "==============START====Attempting to serach by title" 
+  response = HTTParty.get(boardgamegeekApiSearch)
+  respP = response.parsed_response #####parse xml to hash
 
-#   respP = symbolize(respP) #####symbolize string keys
+  respP = symbolize(respP) #####symbolize string keys
 
-#  if respP[:items][:total] == "0"
-#   session[:message] = "No results found"  
-#   redirect to('/../profile') 
-#  end 
+ if respP[:items][:total] == "0"
+  session[:message] = "No results found"  
+  redirect to('/../profile') 
+ end 
 
-#  search_results = [] ###prepare search results
+ search_results = [] ###prepare search results
  
 
-#  if respP[:items][:item].class == Array
-#   puts "Results are array"
+ if respP[:items][:item].class == Array
+  puts "Results are array"
   
-#     respP[:items][:item].each do |entry|         
-#      @name = entry[:name][:value] 
-#      @geekId = entry[:id]
-#      @yearPublished = entry[:yearpublished] ? entry[:yearpublished][:value] : 0 ###some entries don't have yearPublished val whch crashes
-#      search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished})   
-#     end 
-#   else
-#     @name = respP[:items][:item][:name][:value] 
-#     @geekId = respP[:items][:item][:id]  
-#     @yearPublished = respP[:items][:item][:yearpublished] ? respP[:items][:item][:yearpublished][:value] : 0 
-#     search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished}) 
-#   end
+    respP[:items][:item].each do |entry|         
+     @name = entry[:name][:value] 
+     @geekId = entry[:id]
+     @yearPublished = entry[:yearpublished] ? entry[:yearpublished][:value] : 0 ###some entries don't have yearPublished val whch crashes
+     search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished})   
+    end 
+  else
+    @name = respP[:items][:item][:name][:value] 
+    @geekId = respP[:items][:item][:id]  
+    @yearPublished = respP[:items][:item][:yearpublished] ? respP[:items][:item][:yearpublished][:value] : 0 
+    search_results.push({name: @name, geekId: @geekId, yearPublished: @yearPublished}) 
+  end
 
-#   @search_results = search_results
-#   erb :search_results
+  @search_results = search_results
+  erb :search_results
 end
 end
 #########==end game geek search 

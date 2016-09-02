@@ -2,10 +2,17 @@ require 'bundler/setup'
 require "sinatra/activerecord/rake"
 
 ###Works in dev
-ActiveRecord::Base.establish_connection(
-    :adapter => 'sqlite3',
-    :database => 'db.sqlite3'
-  )
+# ActiveRecord::Base.establish_connection(
+#     :adapter => 'sqlite3',
+#     :database => 'db.sqlite3'
+#   )
+
+require 'yaml'
+
+database_cxn = YAML.load_file('./config/database.yaml')
+
+ActiveRecord::Base.establish_connection database_cxn[ENV['RACK_ENV']]
+
 
 # ActiveRecord::Base.establish_connection(
 #     :adapter => 'postgresql',

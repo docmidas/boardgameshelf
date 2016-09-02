@@ -42,7 +42,7 @@ class HomeController < ApplicationController
 
 
   post '/login/?' do
-    user = User.find_by username: params["username"]
+    user = User.find_by username: params["username"].downcase
       if user 
         compare_to = BCrypt::Password.new(user.password)
         if compare_to == params["password"]          

@@ -46,7 +46,7 @@ class UsersController < ApplicationController
   post '/?' do
     #create new user   
     password = BCrypt::Password.create(params["password"])
-    user = User.create username: params["username"], email: params["email"], password: password
+    user = User.create username: params["username"].downcase, email: params["email"], password: password
 
     if user          
       session[:is_logged_in] = true

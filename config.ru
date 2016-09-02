@@ -1,19 +1,19 @@
 require 'bundler'
+require 'yaml'
 
 Bundler.require :default, ENV['RACK_ENV'].to_sym
 
 ###Works in dev
-ActiveRecord::Base.establish_connection(
-    :adapter => 'sqlite3',
-    :database => 'db.sqlite3'
-  )
-
 # ActiveRecord::Base.establish_connection(
-#     :adapter => 'postgresql',
-#     :database => 'boardgameshelf',
-#     :username => 'ctgjjgdwzouwwo',
-#     :password => 'HD1o5NCQPVMFo1kCcmL3ax9yu6'
+#     :adapter => 'sqlite3',
+#     :database => 'db.sqlite3'
 #   )
+
+###Bill changes
+database_cxn = YAML.load_file('./config/database.yaml')
+
+ActiveRecord::Base.establish_connection database_cxn[ENV['RACK_ENV']] # database_cxn['development']
+
 
 #req models
 require './app/models/user'
