@@ -9,6 +9,7 @@ gem 'httparty'
 gem 'pry'
 gem 'tux'
 gem 'xml2json'
+gem 'rake', '~> 11.2', '>= 11.2.2'
 
 ###Works in dev
 group :development do
