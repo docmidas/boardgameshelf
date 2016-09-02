@@ -1,3 +1,5 @@
+require 'bundler/setup'
+
 class ApplicationController < Sinatra::Base
 	register Sinatra::ActiveRecordExtension
 
