@@ -10,7 +10,7 @@ Bundler.require :default, ENV['RACK_ENV'].to_sym
 #   )
 
 ###Bill changes
-database_cxn = YAML.load_file('./config/database.yml')
+database_cxn = YAML.load_file('./config/database.yaml')
 
 ActiveRecord::Base.establish_connection database_cxn[ENV['RACK_ENV']] # database_cxn['development']
 
